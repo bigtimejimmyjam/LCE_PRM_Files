@@ -1,0 +1,114 @@
+# 
+# This library may only be used with the LCE server and may not
+# be used with other products or open source projects
+#
+# NAME:
+# RSA log parser
+#
+# DESCRIPTION:
+# This library is used to process logs from RSA systems.  This takes certain RSA/RADIUS authentication events and
+# parses out usernames and SRC IPs.  Change id numbers as needed
+#
+# Example Syslog Message (triggers SecurID-Auth-LDAP-Failure):
+#	<110>1 2018-04-29T16:12:19Z 10.225.71.51 SINGLEPOINT 2561 RADIUS_USER_LDAP_AUTHENTICATION
+#	[SINGLEPOINT@34162 STATUS="FAIL" CLIENT_ID="RADIUS: CORP-NET-001" IN_RESPONSE_TO="4d6a4e74-a8b5-4b3a-999c-
+#	c6eadf70944" DESCRIPTION="RADIUS  Unsuccessful LDAP authentication- Please Check User Event monitor for 
+#	details." SOURCE-IP-ADDRESS="10.225.71.51" RADIUS_RESPONSE_TYPE="Access-Reject" TENANT_ID="corp" 
+#	USER_NAME="jerry.seinfeld" REQUEST_ID="4d6a4e74-a8b5-4b3a-999c-c6eadf70944" NAS-IP-ADDRESS="10.225.71.51" 
+#	POLICY_ID="VPN-Policy"]
+
+
+#
+# LAST UPDATE: $Date$
+
+
+id=29010
+name=This system has had a SecurID user successfully logout.
+match=INFO
+match=AUTHN_LOGOUT_EVENT
+match=SUCCESS
+match=AU
+match=HN
+match=LO
+match=CC
+match=SS
+match=EV
+match=NT
+regex=([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+),[^,]+,[^,]+,[^,]+,,[^,]+,[^,]+,[^,]+,([A-Za-z0-9_.]+),[^,]+,[^,]
+log=event:SecurID-Logout event2:SecurID-Logout srcip:$1 user:$2 type:rsa
+
+NEXT
+
+id=29011
+name=RADIUS  Authenticator Tokencode authentication succeeded
+match=su
+match=cc
+match=es
+match=RA
+match=DI
+match=RADIUS_RESPONSE_TYPE
+match=TE
+match=NA
+match=Access-Challenge
+regex=([A-Za-z0-9_."-]+) ([A-Za-z0-9_.-]+)="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)" ([A-Za-z0-9_.]+)="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_.]+)=([A-Za-z0-9_."]+) USER_NAME="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_."=-]+) ([A-Za-z0-9_."-=]+) POLICY_ID="VPN-Policy"
+log=event:SecurID-Auth-LDAP-Success event2:SecurID-Auth-LDAP-Success srcip:$3 user:$8 type:rsa
+
+NEXT
+id=29012
+name=RADIUS  Authenticator Tokencode authentication succeeded
+match=su
+match=cc
+match=es
+match=RA
+match=DI
+match=RADIUS_RESPONSE_TYPE
+match=TE
+match=NA
+match=Access-Accept
+regex=([A-Za-z0-9_."-]+) ([A-Za-z0-9_.-]+)="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)" ([A-Za-z0-9_.]+)="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_.]+)=([A-Za-z0-9_."]+) USER_NAME="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_."=-]+) ([A-Za-z0-9_."-=]+) POLICY_ID="VPN-Policy"
+log=event:SecurID-Auth-Tokencode-Success event2:SecurID-Auth-Success srcip:$3 user:$8 type:rsa
+
+NEXT
+
+
+id=29013
+name=RADIUS  Authenticator Tokencode authentication failed
+match=RA
+match=DI
+match=RADIUS_RESPONSE_TYPE
+match=TE
+match=NA
+match=Access-Reject
+regex=([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)" ([A-Za-z0-9_.]+)="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_.]+)=([A-Za-z0-9_."]+) USER_NAME="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_."=-]+) ([A-Za-z0-9_."-=]+) POLICY_ID="VPN-Policy"
+log=event:SecurID-Auth-LDAP-Failure event2:SecurID-Auth-LDAP-Failure srcip:$1 user:$6 type:rsa
+
+NEXT
+
+
+id=29014
+name=RADIUS  Authenticator Tokencode authentication failed
+match=RA
+match=DI
+match=RADIUS_RESPONSE_TYPE
+match=failed
+match=TE
+match=NA
+match=Access-Challenge
+regex=([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)" ([A-Za-z0-9_.]+)="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_.]+)=([A-Za-z0-9_."]+) USER_NAME="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_."=-]+) ([A-Za-z0-9_."-=]+) POLICY_ID="VPN-Policy"
+log=event:SecurID-Auth-Code-Failure event2:SecurID-Auth-Code-Failure srcip:$1 user:$6 type:rsa
+
+NEXT
+
+
+id=29015
+name=RADIUS  Authenticator Tokencode authentication failed
+match=RA
+match=DI
+match=Un
+match=Au
+match=RADIUS_RESPONSE_TYPE
+match=TE
+match=NA
+match=Access-Challenge
+regex=([A-Za-z0-9_." -]+) ([A-Za-z0-9_.-]+)="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)" ([A-Za-z0-9_.]+)="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_.]+)=([A-Za-z0-9_."]+) USER_NAME="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_."=-]+) ([A-Za-z0-9_."-=]+) POLICY_ID="VPN-Policy"
+log=event:SecurID-Auth-Code-Failure event2:SecurID-Auth-Code-Failure srcip:$1 user:$6 type:rsa
