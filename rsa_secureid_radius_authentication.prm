@@ -95,7 +95,7 @@ match=TE
 match=NA
 match=Access-Challenge
 regex=([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)" ([A-Za-z0-9_.]+)="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_.]+)=([A-Za-z0-9_."]+) USER_NAME="([A-Za-z0-9_.-]+)" ([A-Za-z0-9_."=-]+) ([A-Za-z0-9_."-=]+) POLICY_ID="VPN-Policy"
-log=event:SecurID-Auth-Code-Failure event2:SecurID-Auth-Code-Failure srcip:$1 user:$6 type:rsa
+log=event:SecurID-Auth-Tokencode-Failure event2:SecurID-Auth-Tokencode-Failure srcip:$1 user:$6 type:rsa
 
 NEXT
 
